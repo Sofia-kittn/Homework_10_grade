@@ -1,59 +1,84 @@
 #include <iostream>
-#include <vector>
-#include <set>
-#include <map>
 
 using namespace std;
 
-class Inventory{
-    set<string> items;
-    map<string, int> cnt;
+struct Node{
+    int value;
+    Node* next;
+    Node* prev;
 
-    void p_addItem(string name, int count){
-        if(cnt[name] == 0){
-            items.insert(name);
-        }
-        cnt[name] += count;
+    Node(int value, Node* next, Node* prev): value(value), next(next), prev(prev){}
+    Node(): value(0), next(nullptr), prev(nullptr){}
+};
+
+class Stack{
+    Node* front;
+    Node* tail;
+    int size;
+
+public:
+    Stack(): front(nullptr), tail(nullptr), size(0){}
+
+    bool is_empty(){
+        return size == 0;
     }
 
-    bool p_removeItem(string name, int count){
-        if(cnt[name] < count) return false;
-        if(cnt[name] == count){
-            items.erase(name);
-            cnt[name] = 0;
+    void add(int val){
+        Node* elem = new Node(val, nullptr, tail);
+
+        if(size == 0){
+            front = elem;
+        }else{
+            tail->next = elem;
         }
-        cnt[name] -= count;
+        tail = elem;
+        size++;
+    }
+
+    bool pop_st(){
+        if(is_empty()){
+            cout << "error pop_st" << endl;
+            return false;
+        }
+
+        Node* to_del = tail;
+        if(size == 1){
+            front = nullptr;
+            tail = nullptr;
+        }else{
+            tail = tail->prev;
+            tail->next = nullptr;
+        }
+
+        delete to_del;
+        size--;
         return true;
     }
 
-    int p_getCount(string name){
-        return cnt[name];
+    int len(){
+        return size;
     }
 
-public:
-    Inventory(): cnt(), items(){}
+    int last_elem(){
+        if(size == 0){
+            cout << "error last_elem" << endl;
+            return -987654321;
+        }
 
-    void print(){
-        for(string name : items){
-            cout << name << ' ';
+        return tail->value;
+    }
+
+    void del_all(){
+        while(!is_empty()){
+            pop_st();
         }
     }
 
-    void addItem(string name, int count){
-        p_addItem(name, count);
+    ~Stack() {
+        del_all();
     }
-    bool removeItem(string name, int count){
-        return p_removeItem(name, count);
-    }
-
-    int getCount(string name){
-        return p_getCount(name);
-    }
-
-    ~Inventory(){}
 };
 
-
-int main() {
+int main(){
 
 }
