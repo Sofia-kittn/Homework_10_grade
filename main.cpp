@@ -8,115 +8,75 @@ using namespace std;
 
 struct Node{
     int val;
-    Node* left = nullptr;
-    Node* right = nullptr;
-    Node* parent = nullptr;
+    bool is_end = false;
+    vector<Node*> children;
+    int cnt_v = 0;
 
-    Node(int v): val(v){}
-    Node(): val(0){}
+    Node(int v): val(v), children(vector<Node*>(26, nullptr)){}
+    Node(): val(' '), children(vector<Node*>(26, nullptr)){}
 };
 
-void swap_v(Node* a, Node* b){
-    int n = a->val;
-    a->val = b->val;
-    b->val = n;
-}
+class Trie{
+    Node* root;
 
-class Heap{
-    Node* root = nullptr;
-    Node* last = nullptr;
-    int size = 0;
-
-    Node* find(int pos){
-        if(pos == 1) return root;
-
-        vector<int> kids;
-        while(pos > 1){
-            kids.push_back(pos % 2);
-            pos /= 2;
+    void lex(Node* cur, string& pref, vector<string>& words){
+        if(cur->is_end) {
+            for(int i = 0; i < cur->cnt_v; i++) words.push_back(pref);
         }
 
-        reverse(kids.begin(), kids.end());
-
-        Node* cur = root;
-        for(int i : kids){
-            if(i == 0) cur = cur->left;
-            else cur = cur->right;
-
+        for(int i = 0; i < 26; i++){
+            if(cur->children[i] != nullptr){
+                pref += char('a' + i);
+                lex(cur->children[i], pref, words);
+                pref.pop_back();
+            }
         }
-        return cur;
     }
 
 public:
-    void insert(int val){
-        Node* n = new Node(val);
+    Trie(): root(new Node){}
+    ~Trie() {delete root;}
 
-        if(root == nullptr){
-            root = n;
-            last = root;
-            size++;
-            return;
-        }
-
-        int pos = size + 1;
-        Node* prev = find(pos / 2);
-        n->parent = prev;
-        if(pos % 2 == 0) prev->left = n;
-        else prev->right = n;
-        size++;
-        last = n;
-
-        while(n->parent && n->parent->val > n->val){
-            swap_v(n, n->parent);
-            n = n->parent;
-        }
-    }
-
-    void build(vector<int>& vals){
-        for(int i : vals){
-            this->insert(i);
-        }
-    }
-
-    int del_m(){
-        if(!root){
-            cout << "ERROR";
-            return -1;
-        }
-        int ans = root->val;
-
-        if(size == 1){
-            delete root;
-            root = nullptr;
-            last = nullptr;
-            size = 0;
-            return ans;
-        }
-        size--;
-
-        swap_v(root, last);
-        Node* last_prev = last->parent;
-        if(last_prev->left == last) last_prev->left = nullptr;
-        else last_prev->right = nullptr;
-        Node* del = last;
-        last = find(size);
-        delete del;
-
+    void insert(string& word){
         Node* cur = root;
-        while(cur->left != nullptr){
-            Node* small = cur->left;
-            if(cur->right != nullptr && cur->right->val < cur->left->val) small = cur->right;
-            if(cur->val <= small->val) break;
 
-            swap_v(cur, small);
-            cur = small;
+        for(char c : word) {
+            if(cur->children[int(c - 'a')] == nullptr){
+                cur->children[int(c - 'a')] = new Node(c);
+            }
+            cur = cur->children[int(c - 'a')];
         }
-
-        return ans;
+        cur->is_end = true;
+        cur->cnt_v++;
     }
 
-    bool empty(){
-        return size == 0;
+    bool contains(string& word){
+        Node* cur = root;
+        for(char c : word) {
+            if(cur->children[int(c - 'a')] == nullptr){
+                return false;
+            }
+            cur = cur->children[int(c - 'a')];
+        }
+        return cur->is_end;
+    }
+
+    bool starts_with(string& pref){
+        Node* cur = root;
+        for(char c : pref) {
+            if(cur->children[int(c - 'a')] == nullptr){
+                return false;
+            }
+            cur = cur->children[int(c - 'a')];
+        }
+        return true;
+    }
+
+    vector<string> sort_words(){
+        vector<string> words;
+        string pref;
+        lex(root, pref, words);
+        return words;
     }
 };
 
