@@ -1,67 +1,131 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
+#include <deque>
 
 using namespace std;
-int MIN = -1000000001;
 
 struct Node{
-    int val, ind, l, r;
-    Node* left;
+    int val;
     Node* right;
+    Node* left;
 
-    Node(int l, int r): l(l), r(r), val(0), ind(0), left(nullptr), right(nullptr){}
+    Node(int val): val(val), right(nullptr), left(nullptr){}
 };
 
+class BinarySearchTree{
+    Node* head;
+    int size;
 
-class SegmentTree{
-    Node* root;
-    vector<int> tree;
-
-    pair<int, int> ans(Node* n, int l, int r){
-        if(n->r <= l || n->l >= r) return {MIN, -1};
-        if(n->r <= r && n->l >= l) return {n->val, n->ind};
-        auto left = ans(n->left, l, r), right = ans(n->right, l, r);
-        if(left.first < right.first){
-            return right;
-        }
-        return left;
-    }
 public:
-    SegmentTree(vector<int> &arr): tree(arr) {
-        if(arr.empty()){
-            root = nullptr;
-        }else{
-            root = build(0, arr.size());
+    BinarySearchTree(): head(nullptr), size(0){}
+
+    void insert(int val){
+        Node* n = new Node(val);
+        if(head == nullptr){
+            head = n;
+            size++;
+            return;
+        }
+
+        Node* cur = head;
+        while(true){
+            if(cur->val > val){
+                if(cur->left == nullptr){
+                    cur->left = n;
+                    size++;
+                    return;
+                }
+                cur = cur->left;
+            }else if(cur->val < val){
+                if(cur->right == nullptr){
+                    cur->right = n;
+                    size++;
+                    return;
+                }
+                cur = cur->right;
+            }else return;
         }
     }
 
-    Node* build(int l, int r){
-        Node* n = new Node(l, r);
-        if(r - l == 1){
-            if(l >= tree.size()){
-                n->val = MIN;
-            }else{
-                n->val = tree[l];
+    Node* contains(int val){
+        if(head == nullptr) return nullptr;
+
+        Node* cur = head;
+        while(cur != nullptr && cur->val != val){
+            if(cur->val > val){
+                cur = cur->left;
+            }else if(cur->val < val){
+                cur = cur->right;
             }
-            n->ind = l;
-            return n;
         }
-
-        int mid = (l + r) / 2;
-        n->left = build(l, mid);
-        n->right = build(mid, r);
-        n->val = max(n->left->val, n->right->val);
-        if(n->left->val >= n->right->val){
-            n->ind = n->left->ind;
-        }else{
-            n->ind = n->right->ind;
-        }
-        return n;
+        return cur;
     }
 
-    pair<int, int> ans(int l, int r){
-        return ans(root, l, r);
+    void erase(int val){
+        if(head == nullptr) return;
+
+        Node* cur = head;
+        Node* pr = nullptr;
+        while(cur && cur->val != val){
+            pr = cur;
+            if(cur->val > val){
+                cur = cur->left;
+            }else if(cur->val < val){
+                cur = cur->right;
+            }
+        }
+        if(!cur) return;
+
+        if(cur->right && cur->left){
+            Node* par = cur;
+            Node* ncur = cur->right;
+            while(ncur->left){
+                par = ncur;
+                ncur = ncur->left;
+            }
+            cur->val = ncur->val;
+            pr = par;
+            cur = ncur;
+        }
+
+        Node* child = cur->left;
+        if(!child) child = cur->right;
+
+        if(!pr) head = child;
+        else if(pr->left == cur) pr->left = child;
+        else pr->right = child;
+
+        delete cur;
+        size--;
+    }
+
+    void print(){
+        deque<Node*> st;
+        Node* cur = head;
+
+        while(cur != nullptr || !st.empty()){
+            while(cur != nullptr){
+                st.push_back(cur);
+                cur = cur->left;
+            }
+            cur = st.back();
+            st.pop_back();
+
+            cout << cur->val << ' ';
+            cur = cur->right;
+        }
+    }
+
+    bool empty(){
+        if(head == nullptr) return true;
+        return false;
+    }
+
+    int whatSize(){
+        return size;
+    }
+
+    ~BinarySearchTree(){
+        delete head;
     }
 };
 
