@@ -1,7 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <map>
-#include <set>
 #include <algorithm>
 
 using namespace std;
@@ -69,12 +67,6 @@ public:
         while(n->parent && n->parent->val > n->val){
             swap_v(n, n->parent);
             n = n->parent;
-        }
-    }
-
-    void build(vector<int>& vals){
-        for(int i : vals){
-            this->insert(i);
         }
     }
 
