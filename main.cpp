@@ -18,6 +18,9 @@ class List{
 
 public:
     List(): head(nullptr), tail(nullptr), size(0){}
+    ~List(){
+        clear();
+    }
 
     bool is_empty(){
         return size == 0;
@@ -90,6 +93,7 @@ public:
         }
         if(i == size - 1){
             push_back(val);
+            return;
         }
 
         Node* elem = new Node(val);
@@ -142,9 +146,10 @@ public:
             tail = nullptr;
         }else{
             head = head->next;
-            head->prev = tail;
+            head->prev = nullptr;
         }
         delete to_del;
+        size--;
         return true;
     }
 
@@ -154,15 +159,16 @@ public:
             return false;
         }
 
-        Node* to_del = head;
+        Node* to_del = tail;
         if(size == 1) {
             head = nullptr;
             tail = nullptr;
         }else{
             tail = tail->prev;
-            tail->next = head;
+            tail->next = nullptr;
         }
         delete to_del;
+        size--;
         return true;
     }
 
@@ -187,6 +193,7 @@ public:
                 to_del->next->prev = to_del->prev;
                 to_del->prev->next = to_del->next;
                 delete to_del;
+                size--;
                 return true;
             }
             ind++;
