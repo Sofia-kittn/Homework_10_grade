@@ -1,11 +1,18 @@
 #include "stack.h"
+#include "sort_st.h"
 #include <iostream>
-#include <string>
 
 using namespace std;
 
 int main(){
+    int n;
+    cin >> n;
     Stack s;
 
-    // извините, стало лень писать использование стека
+    for(int i = 0; i < n; i++){
+        int a;
+        cin >> a;
+        s.add(a);
+    }
+    sort_st(s);
 }
