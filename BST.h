@@ -12,6 +12,9 @@ class BinarySearchTree {
     Node *head;
     int size;
 
+    //удаляет все элементы
+    void clear(Node* n);
+
 public:
     BinarySearchTree();
     ~BinarySearchTree();

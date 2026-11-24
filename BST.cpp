@@ -8,7 +8,7 @@ Node::Node(int val): val(val), right(nullptr), left(nullptr){}
 
 BinarySearchTree::BinarySearchTree(): head(nullptr), size(0) {}
 BinarySearchTree::~BinarySearchTree(){
-    delete head;
+    clear(head);
 }
 
 void BinarySearchTree::insert(int val) {
@@ -116,4 +116,11 @@ bool BinarySearchTree::empty(){
 
 int BinarySearchTree::whatSize(){
     return size;
+}
+
+void BinarySearchTree::clear(Node * n) {
+    if(!n) return;
+    clear(n->left);
+    clear(n->right);
+    delete n;
 }
