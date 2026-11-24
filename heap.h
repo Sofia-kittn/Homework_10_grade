@@ -17,20 +17,27 @@ class Heap{
     Node* last = nullptr;
     int size = 0;
 
+    //поиск узла по позиции
     Node* find(int pos);
+
+    //очищение кучи
+    void clear(Node*);
 public:
     Heap();
     ~Heap();
 
-    //
+    //обавление элемента
     void insert(int val);
 
-    //
+    //удаление max/min элемента
     int del_m();
 
-    //
-    int get_min();
+    //взятие max/min элемента
+    int get_m();
 
-    //
+    //проверка пустоты
     bool empty();
+
+    //проверка размера кучи
+    int what_size();
 };
