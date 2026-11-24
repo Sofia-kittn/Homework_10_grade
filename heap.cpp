@@ -16,8 +16,7 @@ void swap_v(Node* a, Node* b){
 
 Heap::Heap(): size(0), root(nullptr), last(nullptr){}
 Heap::~Heap(){
-    delete root;
-    delete last;
+    clear(root);
 }
 
 Node* Heap::find(int pos){
@@ -39,7 +38,6 @@ Node* Heap::find(int pos){
     for(int i : kids){
         if(i == 0) cur = cur->left;
         else cur = cur->right;
-
     }
     return cur;
 }
@@ -62,7 +60,7 @@ void Heap::insert(int val){
     size++;
     last = n;
 
-    while(n->parent && n->parent->val > n->val){
+    while(n->parent && n->parent->val < n->val){
         swap_v(n, n->parent);
         n = n->parent;
     }
@@ -93,12 +91,12 @@ int Heap::del_m(){
 
     Node* cur = root;
     while(cur->left != nullptr){
-        Node* small = cur->left;
-        if(cur->right != nullptr && cur->right->val < cur->left->val) small = cur->right;
-        if(cur->val <= small->val) break;
+        Node* child = cur->left;
+        if(cur->right != nullptr && cur->right->val > cur->left->val) child = cur->right;
+        if(cur->val >= child->val) break;
 
-        swap_v(cur, small);
-        cur = small;
+        swap_v(cur, child);
+        cur = child;
     }
 
     return ans;
@@ -108,9 +106,20 @@ bool Heap::empty(){
     return size == 0;
 }
 
-int Heap::get_min(){
+int Heap::get_m(){
     if(!root){
-        throw "error get_min heap is empty";
+        throw "error get_m heap is empty";
     }
     return root->val;
+}
+
+int Heap::what_size() {
+    return size;
+}
+
+void Heap::clear(Node* n) {
+    if(!n)return;
+    clear(n->right);
+    clear(n->left);
+    delete n;
 }
